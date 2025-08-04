@@ -1,65 +1,62 @@
 const choices = ["rock", "paper", "scissors"];
+let playerScore = 0;
+let aiScore = 0;
+const aiChoice = document.getElementById("ia-choice");
+const currentResult = document.getElementById("current-result");
+const playerScoreEl = document.getElementById("player-score");
+const aiScoreEl = document.getElementById("ai-score");
+const restartBtn = document.querySelector(".restart-btn");
 
-const getComputerChoice = () => {
+restartBtn.addEventListener("click", restartScore);
+const cards = document.querySelectorAll(".cards__item");
+cards.forEach((card) => {
+  card.addEventListener("click", play);
+});
+
+const getAIChoice = () => {
   const index = Math.floor(Math.random() * choices.length);
   return choices[index];
 };
 
-const getHumanChoice = () => {
-  let choice = "";
-  while (true) {
-    choice = prompt("Type Rock, Paper or Scissors\nCase insensitive:").toLowerCase();
-    if (choices.includes(choice)) break;
-    alert("Type a valid option!");
+const getWinner = (playerChoice, computerChoice) => {
+  if (playerChoice === computerChoice) return 0;
+
+  if (
+    (playerChoice === "paper" && computerChoice === "rock") ||
+    (playerChoice === "scissors" && computerChoice === "paper") ||
+    (playerChoice === "rock" && computerChoice === "scissors")
+  ) {
+    return 1;
   }
-  return choice;
+  return -1;
 };
 
-const playARound = () => {
-    const humanChoice = getHumanChoice()
-    const computerChoice = getComputerChoice()
-    console.log(`You chose ${humanChoice}, AI chose ${computerChoice}`)
+function play(e) {
+  const playerChoice = e.currentTarget.dataset.choice;
+  const computerChoice = getAIChoice();
+  aiChoice.textContent = `AI choose ${computerChoice}`;
+  const winner = getWinner(playerChoice, computerChoice);
 
-   if (humanChoice === computerChoice) return 0;
+  if (winner === -1) {
+    currentResult.textContent = "AI wins";
+    aiScore++;
+  } else if (winner === 1) {
+    currentResult.textContent = "You win!";
+    playerScore++;
+  } else {
+    currentResult.textContent = "It's a draw";
+  }
+    updateScore(playerScore, aiScore);
 
-   if (
-    (humanChoice === "paper" && computerChoice === "rock") ||
-    (humanChoice === "scissors" && computerChoice === "paper") ||
-    (humanChoice === "rock" && computerChoice === "scissors")
-   ){
-    return 1;
-   }
-   return -1;
 }
 
-const play = () => {
-    let humanPoints = 0
-    let computerPoints = 0
-    const rounds = 5
-    for (let i = 0; i < rounds; i++) {
-        const result = playARound()
-
-        if (result === -1){
-            console.log("AI wins")
-            computerPoints++;
-        } else if (result === 1){
-            console.log("Player wins")
-            humanPoints++;
-        } else {
-            console.log("It's a tie")
-        }
-        console.log("Player: " + humanPoints)
-        console.log("AI: " + computerPoints)
-        console.log("   --------")
-    }
-
-    if (humanPoints > computerPoints) {
-        console.log("You win the game!");
-    } else if (computerPoints > humanPoints) {
-        console.log("AI wins the game!");
-    } else {
-        console.log("The game is a tie!");
-    }
+function restartScore() {
+    playerScore = 0;
+    aiScore = 0;
+    updateScore(playerScore, aiScore);
 }
-    
-play()
+
+function updateScore(playerScore, aiScore){
+    playerScoreEl.textContent = playerScore;
+    aiScoreEl.textContent = aiScore;
+}
